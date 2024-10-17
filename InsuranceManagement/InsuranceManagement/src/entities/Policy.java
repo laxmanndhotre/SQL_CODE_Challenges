@@ -39,5 +39,10 @@ public class Policy {
 	public String toString() {
 		return "Policy [policyId=" + policyId + ", policyName=" + policyName + ", policyType=" + policyType + "]";
 	}
+
+	public int getPolicyID() {
+		// TODO Auto-generated method stub
+		return policyId;
+	}
     
 }

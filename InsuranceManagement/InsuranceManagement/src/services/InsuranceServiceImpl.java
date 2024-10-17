@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import dao.IPolicyService;
 import entities.Policy;
+import myexceptions.PolicyNotFoundException;
 
 public class InsuranceServiceImpl implements IPolicyService {
     private final String url = "jdbc:mysql://localhost:3306/insurance";
@@ -17,10 +18,12 @@ public class InsuranceServiceImpl implements IPolicyService {
 
     
     public boolean createPolicy(Policy policy) {
-        String sql = "INSERT INTO Policy (policyName, policyType) VALUES (?, ?)";
+        String sql = "INSERT INTO policy (policyID, policyName, policyType) VALUES (?, ?, ?)";
+
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, policy.getPolicyName());
-            pstmt.setString(2, policy.getPolicyType());
+            pstmt.setInt(1, policy.getPolicyID());  // Set policyID
+            pstmt.setString(2, policy.getPolicyName());
+            pstmt.setString(3, policy.getPolicyType());
             pstmt.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -28,6 +31,7 @@ public class InsuranceServiceImpl implements IPolicyService {
             return false;
         }
     }
+
 
     
     public Policy getPolicy(int policyId)   {
@@ -37,9 +41,14 @@ public class InsuranceServiceImpl implements IPolicyService {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 return new Policy(rs.getInt("policyId"), rs.getString("policyName"), rs.getString("policyType"));
+            }else {
+            	throw new PolicyNotFoundException("couldnt find any policy");
             }
         } catch (SQLException e) {
         	System.out.println(e);
+        }
+        catch(PolicyNotFoundException e) {
+        	
         }
        
         return null;
